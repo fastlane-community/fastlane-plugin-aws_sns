@@ -1,0 +1,23 @@
+lane :test do
+  arn = aws_sns(
+    platform: 'APNS',
+    platform_name: 'test_app_ios',
+    platform_apns_private_key_path: 'assets/test_push_cert.p12'
+  )
+  puts "test_app_ios ARN: #{arn}"
+
+  arn = aws_sns(
+    platform: 'APNS',
+    platform_name: 'test_app_ios_with_password',
+    platform_apns_private_key_path: 'assets/test_push_cert_with_password.p12',
+    platform_apns_private_key_password: 'joshissupercool'
+  )
+  puts "test_app_ios_with_password ARN: #{arn}"
+
+  arn = aws_sns(
+    platform: 'GCM',
+    platform_name: 'test_app_android',
+    platform_gcm_api_key: 'AIzaSyCvxIcvwzD1MgXNWnN28KSYZ_fhBr-jZJZ'
+  )
+  puts "test_app_android ARN: #{arn}"
+end
