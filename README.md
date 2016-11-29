@@ -12,7 +12,7 @@ fastlane add_plugin aws_sns
 
 ## About aws_sns
 
-[AWS SNS](https://aws.amazon.com/sns/) is fully manage push notification service. This plugin creates will create AWS SNS platform application for iOS and Android apps.
+[AWS SNS](https://aws.amazon.com/sns/) is fully manage push notification service. This plugin creates an AWS SNS platform application for iOS and Android apps.
 
 iOS app are created by uploading a private key (p12) to AWS SNS - which can easily be created with [PEM](https://github.com/fastlane/fastlane/tree/master/pem)
 
