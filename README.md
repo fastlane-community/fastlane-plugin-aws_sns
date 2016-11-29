@@ -1,4 +1,4 @@
-# aws_sns plugin
+# aws_sns `fastlane` plugin
 
 [![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-aws_sns)
 
@@ -12,15 +12,48 @@ fastlane add_plugin aws_sns
 
 ## About aws_sns
 
-Creates AWS SNS platform applications
+[AWS SNS](https://aws.amazon.com/sns/) is fully manage push notification service. This plugin creates will create AWS SNS platform application for iOS and Android apps.
 
-**Note to author:** Add a more detailed description about this plugin here. If your plugin contains multiple actions, make sure to mention them here.
+iOS app are created by uploading a private key (p12) to AWS SNS - which can easily be created with [PEM](https://github.com/fastlane/fastlane/tree/master/pem)
+
+Android apps are created by sending up a GCM Api Key to AWS SNS - obtained through your [Google Cloud Platform dashboard](https://console.cloud.google.com)
+
+The call to `aws_sns` will return the AWS SNS plattform application's [ARN](http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) (if you need it). The platform application's ARN is what is used to actually send notifications to your app(s) later on.
 
 ## Example
 
-Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plugin. Try it by cloning the repo, running `fastlane install_plugins` and `bundle exec fastlane test`.
+### iOS
+```ruby
+aws_sns(
+  platform: 'APNS',
+  platform_name: 'your_awesome_ios_app',
+  platform_apns_private_key_path: 'path/to/cert.p12',
 
-**Note to author:** Please set up a sample project to make it easy for users to explore what your plugin does. Provide everything that is necessary to try out the plugin in this project (including a sample Xcode/Android project if necessary)
+  # Optional private key password
+  # platform_apns_private_key_password: 'joshissupercool'
+)
+```
+
+### Android
+```ruby
+aws_sns(
+  platform: 'GCM',
+  platform_name: 'your_awesome_android_app',
+  platform_gcm_api_key: 'your_gcm_api_key'
+)
+```
+
+### iOS (using the ARN)
+```ruby
+ios_arn = aws_sns(
+  platform: 'APNS',
+  platform_name: 'your_awesome_ios_app',
+  platform_apns_private_key_path: 'path/to/cert.p12',
+)
+
+# TODO: Possibly send this ARN to someone important who needs to configure stuff
+puts "ARN: #{ios_arn}"
+```
 
 ## Run tests for this plugin
 
@@ -50,3 +83,10 @@ For more information about how the `fastlane` plugin system works, check out the
 ## About `fastlane`
 
 `fastlane` is the easiest way to automate beta deployments and releases for your iOS and Android apps. To learn more, check out [fastlane.tools](https://fastlane.tools).
+
+## Author
+
+Josh Holtz, josh@rokkincat.com, [@joshdholtz](https://twitter.com/joshdholtz)
+
+I'm available for freelance work (Fastlane, iOS, and Android development) :muscle:
+Feel free to contact me :rocket:
