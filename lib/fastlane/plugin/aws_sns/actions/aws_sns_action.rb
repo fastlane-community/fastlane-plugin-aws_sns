@@ -15,7 +15,7 @@ module Fastlane
 
         platform = params[:platform]
         platform_name = params[:platform_name]
-        update_attributes = params[:update_if_exist]
+        update_attributes = params[:update_if_exists]
         platform_apns_private_key_path = params[:platform_apns_private_key_path]
         platform_apns_private_key_password = params[:platform_apns_private_key_password]
 
@@ -100,12 +100,14 @@ module Fastlane
               attributes: attributes,
             })
             arn = resp.platform_application_arn
+            UI.important("Created #{arn}")
           else
             # else, updating
             client.set_platform_application_attributes({
              platform_application_arn: arn,
              attributes: attributes,
            })
+            UI.important("Updated #{arn}")
           end
 
           Actions.lane_context[SharedValues::AWS_SNS_PLATFORM_APPLICATION_ARN] = arn
@@ -179,8 +181,8 @@ module Fastlane
                                       description: "AWS Platform GCM API KEY",
                                       deprecated: "Use :platform_fcm_server_key instead",
                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :update_if_exist,
-                                      env_name: "AWS_SNS_UDPATE_IF_EXIST",
+          FastlaneCore::ConfigItem.new(key: :update_if_exists,
+                                      env_name: "AWS_SNS_UDPATE_IF_EXISTS",
                                       description: "updating certificate/key if platform_name already exists",
                                       default_value: false,
                                       is_string: false,
