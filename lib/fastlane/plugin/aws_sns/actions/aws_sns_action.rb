@@ -1,4 +1,4 @@
-require 'aws-sdk'
+require 'aws-sdk-sns'
 
 module Fastlane
   module Actions
@@ -19,7 +19,8 @@ module Fastlane
         platform_apns_private_key_path = params[:platform_apns_private_key_path]
         platform_apns_private_key_password = params[:platform_apns_private_key_password]
 
-        platform_gcm_api_key = params[:platform_gcm_api_key]
+        platform_fcm_server_key = params[:platform_fcm_server_key]
+        platform_fcm_server_key ||= params[:platform_gcm_api_key]
 
         UI.user_error!("No S3 access key given, pass using `access_key: 'key'`") unless access_key.to_s.length > 0
         UI.user_error!("No S3 secret access key given, pass using `secret_access_key: 'secret key'`") unless secret_access_key.to_s.length > 0
@@ -50,9 +51,10 @@ module Fastlane
             'PlatformCredential': p12.key.to_s,
             'PlatformPrincipal': cert.to_s
           }
-        elsif ['GCM'].include?(platform) && !platform_gcm_api_key.nil?
+        elsif ['GCM', 'FCM'].include?(platform) && !platform_fcm_server_key.nil?
+          platform = 'GCM'
           attributes = {
-            'PlatformCredential': platform_gcm_api_key
+            'PlatformCredential': platform_fcm_server_key
           }
         end
 
@@ -115,7 +117,7 @@ module Fastlane
                                        description: "AWS Platform",
                                        optional: false,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Invalid platform #{value}") unless ['APNS', 'APNS_SANDBOX', 'GCM'].include?(value)
+                                         UI.user_error!("Invalid platform #{value}") unless ['APNS', 'APNS_SANDBOX', 'GCM', 'FCM'].include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :platform_name,
                                       env_name: "AWS_SNS_PLATFORM_NAME",
@@ -130,9 +132,14 @@ module Fastlane
                                       description: "AWS Platform APNS Private Key Password",
                                       optional: true,
                                       default_value: ""),
+          FastlaneCore::ConfigItem.new(key: :platform_fcm_server_key,
+                                      env_name: "AWS_SNS_PLATFORM_FCM_SERVER_KEY",
+                                      description: "AWS Platform FCM SERVER KEY",
+                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :platform_gcm_api_key,
                                       env_name: "AWS_SNS_PLATFORM_GCM_API_KEY",
                                       description: "AWS Platform GCM API KEY",
+                                      deprecated: "Use :platform_fcm_server_key instead",
                                       optional: true)
         ]
       end
