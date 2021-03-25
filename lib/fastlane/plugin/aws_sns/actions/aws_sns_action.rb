@@ -15,7 +15,7 @@ module Fastlane
 
         platform = params[:platform]
         platform_name = params[:platform_name]
-
+        update_attributes = params[:update_if_exists]
         platform_apns_private_key_path = params[:platform_apns_private_key_path]
         platform_apns_private_key_password = params[:platform_apns_private_key_password]
 
@@ -63,12 +63,52 @@ module Fastlane
         #
         UI.crash!("Unable to create any attributes to create platform application") unless attributes
         begin
-          resp = client.create_platform_application({
-            name: platform_name,
-            platform: platform,
-            attributes: attributes,
-          })
-          arn = resp.platform_application_arn
+
+          arn = nil
+          
+          #
+          # Try to find the arn for platform_name
+          #
+          if update_attributes
+
+            # Loop as long as list platform applications returns next_page or return the desired name
+            next_token = nil
+            loop do
+
+              resp = client.list_platform_applications({
+                next_token: next_token,
+              })
+
+              next_token = resp.next_token
+              # TODO: Must find a best search method !
+              platform_application = resp.platform_applications.find { |platform_application| platform_application.platform_application_arn.end_with? platform_name }
+              
+              unless platform_application.nil? 
+                arn = platform_application.platform_application_arn
+                break
+              end
+              break if next_token.nil?
+            end
+
+          end
+          
+          # Not arn? OK, we create it !
+          if arn.nil?  
+            resp = client.create_platform_application({
+              name: platform_name,
+              platform: platform,
+              attributes: attributes,
+            })
+            arn = resp.platform_application_arn
+            UI.important("Created #{arn}")
+          else
+            # else, updating
+            client.set_platform_application_attributes({
+             platform_application_arn: arn,
+             attributes: attributes,
+           })
+            UI.important("Updated #{arn}")
+          end
 
           Actions.lane_context[SharedValues::AWS_SNS_PLATFORM_APPLICATION_ARN] = arn
           ENV[SharedValues::AWS_SNS_PLATFORM_APPLICATION_ARN.to_s] = arn
@@ -140,6 +180,12 @@ module Fastlane
                                       env_name: "AWS_SNS_PLATFORM_GCM_API_KEY",
                                       description: "AWS Platform GCM API KEY",
                                       deprecated: "Use :platform_fcm_server_key instead",
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :update_if_exists,
+                                      env_name: "AWS_SNS_UDPATE_IF_EXISTS",
+                                      description: "updating certificate/key if platform_name already exists",
+                                      default_value: false,
+                                      is_string: false,
                                       optional: true)
         ]
       end

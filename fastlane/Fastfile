@@ -3,7 +3,9 @@ platform :ios do
     arn = aws_sns(
       platform: 'APNS',
       platform_name: 'test_app_ios_2',
-      platform_apns_private_key_path: 'assets/test_push_cert.p12'
+      platform_apns_private_key_path: 'assets/test_push_cert_2.p12',
+
+      update_if_exists: UI.confirm("Update if exists?")
     )
     puts "test_app_ios ARN: #{arn}"
   end
