@@ -1,5 +1,5 @@
 *.gem
-Gemfile.lock
+# Gemfile.lock
 
 ## Documentation cache and generated files:
 /.yardoc/

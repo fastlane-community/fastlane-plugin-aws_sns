@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 platform :ios do
   lane :test do
     arn = aws_sns(
@@ -25,7 +27,7 @@ platform :android do
   lane :test_gcm do
     arn = aws_sns(
       platform: 'GCM',
-      platform_name: 'test_app_android_2',
+      platform_name: 'test_app_android_2'
     )
     puts "test_app_android ARN: #{arn}"
   end
@@ -33,7 +35,7 @@ platform :android do
   lane :test_fcm do
     arn = aws_sns(
       platform: 'FCM',
-      platform_name: 'test_app_android_2',
+      platform_name: 'test_app_android_2'
     )
     puts "test_app_android ARN: #{arn}"
   end
