@@ -1,0 +1,15 @@
+version: 2.1
+jobs:
+  test:
+    docker:
+      - image: cimg/ruby:2.5
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rake
+
+workflows:
+  version: 2
+  test_workflow:
+    jobs:
+      - test
